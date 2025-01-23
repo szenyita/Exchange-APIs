@@ -1,0 +1,1 @@
+currencylayer_api = "http://apilayer.net/api/live?access_key=acd1505542d32515ed55160063d42549"
