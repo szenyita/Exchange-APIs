@@ -5,14 +5,14 @@ from db_config import cursor
 def currencylayer():
     currencylayer_data = requests.get(currencylayer_api).json()
 
-    for currency in currencylayer_data["quotes"]:
+    for currency in currencylayer_data["rates"]:
         table = "currencylayer_" + currency[3:].lower()
 
         create_table  = (
             f"""
             CREATE TABLE IF NOT EXISTS {table} (
                 timestamp INT PRIMARY KEY,
-                quote DECIMAL(65, 30)
+                rate DECIMAL(65, 30)
             )
             """
         )
@@ -20,7 +20,7 @@ def currencylayer():
 
         insert_record = (
             f"""
-            INSERT INTO {table} (timestamp, quote) VALUES
+            INSERT INTO {table} (timestamp, rate) VALUES
             """ + "(%s, %s)"
         )
-        cursor.execute(insert_record, (currencylayer_data["timestamp"], currencylayer_data["quotes"][currency],))
+        cursor.execute(insert_record, (currencylayer_data["timestamp"], currencylayer_data["rates"][currency],))
