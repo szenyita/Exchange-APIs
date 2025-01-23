@@ -1,11 +1,14 @@
 import requests
-from api_endpoints import currencylayer_api
-from db_config import cursor
+from app.config.api_endpoints import currencylayer_api
+from app.config.db_config import cursor
 
 def currencylayer():
     currencylayer_data = requests.get(currencylayer_api).json()
 
-    for currency in currencylayer_data["rates"]:
+    if currencylayer_data["success"] == False:
+        return False
+
+    for currency in currencylayer_data["quotes"]:
         table = "currencylayer_" + currency[3:].lower()
 
         create_table  = (
@@ -23,4 +26,4 @@ def currencylayer():
             INSERT INTO {table} (timestamp, rate) VALUES
             """ + "(%s, %s)"
         )
-        cursor.execute(insert_record, (currencylayer_data["timestamp"], currencylayer_data["rates"][currency],))
+        cursor.execute(insert_record, (currencylayer_data["timestamp"], currencylayer_data["quotes"][currency],))
