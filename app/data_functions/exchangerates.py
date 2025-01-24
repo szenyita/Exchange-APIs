@@ -1,11 +1,15 @@
 import requests
 from decimal import Decimal, getcontext
-from app.config.api_endpoints import exchangerates_api
-from app.config.db_config import cursor
+from config.api_endpoints import exchangerates_api
+from config.db_config import cursor
 
 def exchangerates():
     getcontext().prec = 30
-    exchangerates_data = requests.get(exchangerates_api).json()
+
+    try:
+        exchangerates_data = requests.get(exchangerates_api).json()
+    except:
+        return False
 
     if exchangerates_data["success"] == False:
         return False
@@ -29,3 +33,5 @@ def exchangerates():
             """ + "(%s, %s)"
         )
         cursor.execute(insert_record, (exchangerates_data["timestamp"], Decimal(str(exchangerates_data["rates"][currency])) / Decimal(str(exchangerates_data["rates"]["USD"])),))
+    
+    return True

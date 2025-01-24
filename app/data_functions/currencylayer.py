@@ -1,9 +1,12 @@
 import requests
-from app.config.api_endpoints import currencylayer_api
-from app.config.db_config import cursor
+from config.api_endpoints import currencylayer_api
+from config.db_config import cursor
 
 def currencylayer():
-    currencylayer_data = requests.get(currencylayer_api).json()
+    try:
+        currencylayer_data = requests.get(currencylayer_api).json()
+    except:
+        return False
 
     if currencylayer_data["success"] == False:
         return False
@@ -27,3 +30,5 @@ def currencylayer():
             """ + "(%s, %s)"
         )
         cursor.execute(insert_record, (currencylayer_data["timestamp"], currencylayer_data["quotes"][currency],))
+    
+    return True

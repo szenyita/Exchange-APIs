@@ -1,28 +1,26 @@
 import schedule
 import time
-from app.data_functions.currencylayer import currencylayer
-from app.data_functions.exchangerates import exchangerates
+from data_functions.currencylayer import currencylayer
+from data_functions.exchangerates import exchangerates
 
-currencylayer_retry, exchangerates_retry = None
+currencylayer_success, exchangerates_success = False, False
 
 def main():
-    global currencylayer_retry, exchangerates_retry
-
+    global currencylayer_success, exchangerates_success
     currencylayer_success = currencylayer()
     exchangerates_success = exchangerates()
 
-    if not currencylayer_success and currencylayer_retry is None:
-        currencylayer_retry = schedule.every(5).minutes.do(currencylayer)
-    elif currencylayer_retry is not None:
-        schedule.cancel_job(currencylayer_retry)
-    
-    if not exchangerates_success and exchangerates_retry is None:
-        exchangerates_retry = schedule.every(5).minutes.do(exchangerates)
-    elif exchangerates_retry is not None:
-        schedule.cancel_job(exchangerates_retry)
-
-schedule.every().day.at("00:00").do(main).tag("daily")
+schedule.every().day.at("00:00").do(main)
 
 while True:
     schedule.run_pending()
+
+    while not currencylayer_success or not exchangerates_success:
+        if not currencylayer_success:
+            currencylayer_success = currencylayer()
+        if not exchangerates_success:
+            exchangerates_success = exchangerates()
+
+        time.sleep(5 * 60)
+
     time.sleep(1)
