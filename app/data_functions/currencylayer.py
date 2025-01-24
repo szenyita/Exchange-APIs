@@ -12,6 +12,9 @@ def currencylayer():
         return False
 
     for currency in currencylayer_data["quotes"]:
+        if not currency.isalpha():
+            continue
+        
         table = "currencylayer_" + currency[3:].lower()
 
         create_table  = (

@@ -15,6 +15,9 @@ def exchangerates():
         return False
 
     for currency in exchangerates_data["rates"]:
+        if not currency.isalpha():
+            continue
+
         table = "exchangerates_" + currency.lower()
 
         create_table  = (
