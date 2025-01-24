@@ -16,7 +16,7 @@ def main():
         time.sleep(5 * 60)
 
 
-schedule.every().day.at("00:00").do(main)
+schedule.every().day.at("14:59:20").do(main)
 
 while True:
     schedule.run_pending()

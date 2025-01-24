@@ -1,5 +1,6 @@
 import requests
 from decimal import Decimal, getcontext
+from config.crypto_symbols import crypto_symbols
 from config.api_endpoints import exchangerates_api
 from config.db_config import cursor
 
@@ -19,22 +20,30 @@ def exchangerates():
             continue
 
         table = "exchangerates_" + currency.lower()
-
-        create_table  = (
-            f"""
-            CREATE TABLE IF NOT EXISTS {table} (
-                timestamp INT PRIMARY KEY,
-                rate DECIMAL(65, 30)
+        
+        try:
+            create_table  = (
+                f"""
+                CREATE TABLE IF NOT EXISTS {table} (
+                    timestamp INT PRIMARY KEY,
+                    rate DECIMAL(65, 30)
+                )
+                """
             )
-            """
-        )
-        cursor.execute(create_table)
+            cursor.execute(create_table)
 
-        insert_record = (
-            f"""
-            INSERT INTO {table} (timestamp, rate) VALUES
-            """ + "(%s, %s)"
-        )
-        cursor.execute(insert_record, (exchangerates_data["timestamp"], Decimal(str(exchangerates_data["rates"][currency])) / Decimal(str(exchangerates_data["rates"]["USD"])),))
+            insert_record = (
+                f"""
+                INSERT INTO {table} (timestamp, rate) VALUES
+                """ + "(%s, %s)"
+            )
+            
+            if currency.upper() in crypto_symbols:
+                cursor.execute(insert_record, (exchangerates_data["timestamp"], 1 / (Decimal(str(exchangerates_data["rates"][currency])) / Decimal(str(exchangerates_data["rates"]["USD"]))),))
+            else:
+                cursor.execute(insert_record, (exchangerates_data["timestamp"], Decimal(str(exchangerates_data["rates"][currency])) / Decimal(str(exchangerates_data["rates"]["USD"])),))
+        
+        except:
+            return False
     
     return True
