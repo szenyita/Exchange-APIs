@@ -1,8 +1,8 @@
 import requests
 from decimal import Decimal, getcontext
-from config.crypto_symbols import crypto_symbols
 from config.api_endpoints import exchangerates_api
 from config.db_config import cursor
+from config.currency_symbols import currency_symbols
 
 def exchangerates():
     getcontext().prec = 30
@@ -38,10 +38,10 @@ def exchangerates():
                 """ + "(%s, %s)"
             )
             
-            if currency.upper() in crypto_symbols:
-                cursor.execute(insert_record, (exchangerates_data["timestamp"], 1 / (Decimal(str(exchangerates_data["rates"][currency])) / Decimal(str(exchangerates_data["rates"]["USD"]))),))
-            else:
+            if currency.upper() in currency_symbols:
                 cursor.execute(insert_record, (exchangerates_data["timestamp"], Decimal(str(exchangerates_data["rates"][currency])) / Decimal(str(exchangerates_data["rates"]["USD"])),))
+            else:
+                cursor.execute(insert_record, (exchangerates_data["timestamp"], 1 / (Decimal(str(exchangerates_data["rates"][currency])) / Decimal(str(exchangerates_data["rates"]["USD"]))),))
         
         except:
             return False

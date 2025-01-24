@@ -2,7 +2,7 @@ import requests
 from decimal import Decimal, getcontext
 from config.api_endpoints import currencylayer_api
 from config.db_config import cursor
-from config.crypto_symbols import crypto_symbols
+from config.currency_symbols import currency_symbols
 
 def currencylayer():
     getcontext().prec = 30
@@ -39,10 +39,10 @@ def currencylayer():
                 """ + "(%s, %s)"
             )
 
-            if currency[3:].upper() in crypto_symbols:
-                cursor.execute(insert_record, (currencylayer_data["timestamp"], 1 / Decimal(str(currencylayer_data["quotes"][currency])),))
-            else:
+            if currency[3:].upper() in currency_symbols:
                 cursor.execute(insert_record, (currencylayer_data["timestamp"], currencylayer_data["quotes"][currency],))
+            else:
+                cursor.execute(insert_record, (currencylayer_data["timestamp"], 1 / Decimal(str(currencylayer_data["quotes"][currency])),))
         
         except:
             return False
